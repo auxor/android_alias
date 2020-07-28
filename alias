@@ -1,0 +1,17 @@
+# -- logcat related ------------------------
+
+alias log='adb logcat -v threadtime -v color'
+
+function logtee() {
+    log | tee $1
+}
+
+function logpid() {
+    log --pid=$1
+}
+
+function logpkg() {
+    log --pid=$(adb shell pidof $1)
+}
+
+# -- logcat related end --------------------
