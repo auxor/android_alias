@@ -15,3 +15,36 @@ function logpkg() {
 }
 
 # -- logcat related end --------------------
+
+# -- bugreport related ------------------------
+
+## grep logs in bugreport by time order
+function loggrep() {
+   if [ -f logcat.01 ];then
+     ls -tr logcat* | xargs grep "$1"
+   elif [ -d FS/data/misc/logd ];then
+     cd FS/data/misc/logd
+     ls -tr logcat* | xargs grep "$1"
+     cd -
+   fi
+}
+function logegrep() {
+   if [ -f logcat.01 ];then
+     ls -tr logcat* | xargs egrep "$1"
+   elif [ -d FS/data/misc/logd ];then
+     cd FS/data/misc/logd
+     ls -tr logcat* | xargs egrep "$1"
+     cd -
+   fi
+}
+
+# print dumpsys service from bugreport
+function printser() {
+  name=${1//\./\\.}
+  name=${1//\//\\/}
+  file="$(ls bugreport-*.txt | sort -V | tail -n1)"
+  sed -n "/^SERVICE .*$name/,/^SERVICE/p" $file
+}
+
+# -- bugreport related end --------------------
+
