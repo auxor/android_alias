@@ -48,3 +48,51 @@ function printser() {
 
 # -- bugreport related end --------------------
 
+# -- flash -----------------------------------
+
+function flash() {
+  DIR="."
+  if [ $ANDROID_PRODUCT_OUT ]; then
+    DIR=$ANDROID_PRODUCT_OUT
+  fi
+
+  wipedata=0
+  disable_verity=0
+  for item in $*; do
+    if [ $item == '-w' ]; then
+      wipedata=1
+    fi
+    if [ $item == '-d' ]; then
+      disable_verity=1
+    fi
+    if [[ $item != "-"* ]]; then
+      DIR=$item
+    fi
+  done
+
+  echo "flash $DIR"
+  adb reboot bootloader
+
+  fastboot flash dtbo $DIR/dtbo.img
+
+  if [ $disable_verity == 1 ]; then
+    echo -e "\n\n disable verity ........\n\n"
+    fastboot --disable-verity --disable-verification flash vbmeta $DIR/vbmeta.img
+  else
+    fastboot flash vbmeta $DIR/vbmeta.img
+  fi
+
+  fastboot flash system $DIR/system.img
+  fastboot flash vendor $DIR/vendor.img
+  fastboot flash boot $DIR/boot.img
+  fastboot flash recovery $DIR/recovery.img
+
+  if [ $wipedata == 1 ]; then
+    fastboot -w
+  fi
+
+  fastboot reboot
+}
+
+# -- flash end  -----------------------------------
+
