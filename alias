@@ -46,6 +46,14 @@ function printser() {
   sed -n "/^SERVICE .*$name/,/^SERVICE/p" $file
 }
 
+# print dumpsys package from bugreport
+function printpkg() {
+  name=${1//\./\\.}
+  name=${1//\//\\/}
+  file="$(ls bugreport-*.txt | sort -V | tail -n1)"
+  sed -n "/^  Package \[.*$name\]/,/^  Package /p" $file
+}
+
 # -- bugreport related end --------------------
 
 # -- flash -----------------------------------
