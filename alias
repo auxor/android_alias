@@ -117,3 +117,9 @@ function flash() {
 }
 
 # -- flash end  -----------------------------------
+
+# unpack ramdisk to current dir
+function unpack_ramdisk()
+{
+  gunzip -c $1 | cpio -idm
+}
