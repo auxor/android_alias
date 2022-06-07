@@ -58,6 +58,14 @@ function printpkg() {
 
 # -- flash -----------------------------------
 
+function flash_if_exist() {
+    img=$1
+    path=$2
+    if [ -f $path ]; then
+        fastboot flash $img $path
+    fi
+}
+
 function flash() {
   DIR="."
   if [ $ANDROID_PRODUCT_OUT ]; then
@@ -81,19 +89,25 @@ function flash() {
   echo "flash $DIR"
   adb reboot bootloader
 
-  fastboot flash dtbo $DIR/dtbo.img
+  flash_if_exist dtbo $DIR/dtbo.img
 
   if [ $disable_verity == 1 ]; then
     echo -e "\n\n disable verity ........\n\n"
     fastboot --disable-verity --disable-verification flash vbmeta $DIR/vbmeta.img
   else
-    fastboot flash vbmeta $DIR/vbmeta.img
+    flash_if_exist vbmeta $DIR/vbmeta.img
   fi
 
-  fastboot flash system $DIR/system.img
-  fastboot flash vendor $DIR/vendor.img
-  fastboot flash boot $DIR/boot.img
-  fastboot flash recovery $DIR/recovery.img
+  flash_if_exist vbmeta_system $DIR/vbmeta_system.img
+  flash_if_exist boot $DIR/boot.img
+  flash_if_exist recovery $DIR/recovery.img
+  if [ -f $DIR/super.img ]; then
+      flash_if_exist super $DIR/super.img
+  else
+      flash_if_exist system $DIR/system.img
+      flash_if_exist vendor $DIR/vendor.img
+      flash_if_exist product $DIR/product.img
+  fi
 
   if [ $wipedata == 1 ]; then
     fastboot -w
@@ -103,4 +117,3 @@ function flash() {
 }
 
 # -- flash end  -----------------------------------
-
