@@ -60,9 +60,9 @@ function printpkg() {
 
 function flash_if_exist() {
     img=$1
-    path=$2
-    if [ -f $path ]; then
-        fastboot flash $img $path
+    file=$2
+    if [ -f $file ]; then
+        fastboot flash $img $file
     fi
 }
 
@@ -75,7 +75,7 @@ function flash() {
   wipedata=0
   disable_verity=0
   for item in $*; do
-    if [ $item == '-w' ]; then
+    if [[ "$item" == '-w' ]]; then
       wipedata=1
     fi
     if [ $item == '-d' ]; then
@@ -91,7 +91,7 @@ function flash() {
 
   flash_if_exist dtbo $DIR/dtbo.img
 
-  if [ $disable_verity == 1 ]; then
+  if [[ $disable_verity == 1 ]]; then
     echo -e "\n\n disable verity ........\n\n"
     fastboot --disable-verity --disable-verification flash vbmeta $DIR/vbmeta.img
   else
@@ -101,7 +101,7 @@ function flash() {
   flash_if_exist vbmeta_system $DIR/vbmeta_system.img
   flash_if_exist boot $DIR/boot.img
   flash_if_exist recovery $DIR/recovery.img
-  if [ -f $DIR/super.img ]; then
+  if [[ -f $DIR/super.img ]]; then
       flash_if_exist super $DIR/super.img
   else
       flash_if_exist system $DIR/system.img
@@ -109,7 +109,7 @@ function flash() {
       flash_if_exist product $DIR/product.img
   fi
 
-  if [ $wipedata == 1 ]; then
+  if [[ $wipedata == 1 ]]; then
     fastboot -w
   fi
 
