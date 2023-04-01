@@ -21,19 +21,19 @@ function logpkg() {
 ## grep logs in bugreport by time order
 function loggrep() {
    if [ -f logcat ];then
-     find . -name 'logcat*' -printf "%P\n" | sort -t '.' -k2n | xargs grep "$1"
+     find . -name 'logcat*' -printf "%P\n" | sort -t '.' -k2nr | xargs grep "$1"
    elif [ -d FS/data/misc/logd ];then
      cd FS/data/misc/logd
-     find . -name 'logcat*' -printf "%P\n" | sort -t '.' -k2n | xargs grep "$1"
+     find . -name 'logcat*' -printf "%P\n" | sort -t '.' -k2nr | xargs grep "$1"
      cd -
    fi
 }
 function logegrep() {
    if [ -f logcat ];then
-     find . -name 'logcat*' -printf "%P\n" | sort -t '.' -k2n | xargs egrep "$1"
+     find . -name 'logcat*' -printf "%P\n" | sort -t '.' -k2nr | xargs egrep "$1"
    elif [ -d FS/data/misc/logd ];then
      cd FS/data/misc/logd
-     find . -name 'logcat*' -printf "%P\n" | sort -t '.' -k2n | xargs egrep "$1"
+     find . -name 'logcat*' -printf "%P\n" | sort -t '.' -k2nr | xargs egrep "$1"
      cd -
    fi
 }
