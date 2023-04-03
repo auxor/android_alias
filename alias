@@ -18,13 +18,13 @@ function logpkg() {
 
 # -- bugreport related ------------------------
 
-## grep logs in bugreport by time order
+## grep logs in bugreport
 function loggrep() {
    if [ -f logcat ];then
-     find . -name 'logcat*' -printf "%P\n" | sort -t '.' -k2nr | xargs grep "$1"
+     find . -name 'logcat*' -printf "%P\n" | sort -t '.' -k2nr | xargs grep $(for arg in "$@"; do echo -n "${arg}\|"; done | sed 's/..$//')
    elif [ -d FS/data/misc/logd ];then
      cd FS/data/misc/logd
-     find . -name 'logcat*' -printf "%P\n" | sort -t '.' -k2nr | xargs grep "$1"
+     find . -name 'logcat*' -printf "%P\n" | sort -t '.' -k2nr | xargs grep $(for arg in "$@"; do echo -n "${arg}\|"; done | sed 's/..$//')
      cd -
    fi
 }
