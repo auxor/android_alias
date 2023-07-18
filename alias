@@ -66,20 +66,45 @@ function flash_if_exist() {
     fi
 }
 
+function check_board_matched() {
+if [ -f $1/android-info.txt ]; then
+    required_board=$(grep board $1/android-info.txt | awk -F= '{print $2}')
+    board=$(adb shell getprop ro.product.device)
+    if [[ $required_board != $board ]]; then
+       echo "The images for $required_board are not matched with $board"
+       return -1
+    else
+       return 0
+    fi
+else
+  echo "android-info.txt not exist, skip board check!"
+  return 0
+fi
+
+}
+
 function flash() {
   DIR="."
   if [ $ANDROID_PRODUCT_OUT ]; then
     DIR=$ANDROID_PRODUCT_OUT
   fi
 
+  check_matched=1
   wipedata=0
   disable_verity=0
+  flash_bootloader=0
   for item in $*; do
     if [[ "$item" == '-w' ]]; then
       wipedata=1
     fi
-    if [ $item == '-d' ]; then
+    if [[ $item == '-d' ]]; then
       disable_verity=1
+    fi
+    if [[ $item == '-b' ]]; then
+      flash_bootloader=1
+    fi
+    if [[ $item == '-nocheck' ]]; then
+      check_matched=0
     fi
     if [[ $item != "-"* ]]; then
       DIR=$item
@@ -87,8 +112,20 @@ function flash() {
   done
 
   echo "flash $DIR"
+
+  if [[ $check_matched != 0 ]];then
+    check_board_matched $DIR
+    if [[ $? != 0 ]];then
+       return -1
+    fi
+  fi
+
   adb reboot bootloader
 
+  if [[ $flash_bootloader == 1 ]]; then
+     flash_if_exist bootloader $DIR/bootloader.img
+     fastboot reboot bootloader
+  fi
   flash_if_exist dtbo $DIR/dtbo.img
 
   if [[ $disable_verity == 1 ]]; then
