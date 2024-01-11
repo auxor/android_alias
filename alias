@@ -155,6 +155,43 @@ function flash() {
 
 # -- flash end  -----------------------------------
 
+function mkbootanimation() {
+   # Save the original directory
+   original_dir=$(pwd)
+
+   if [ -z "$1" ]; then
+      workdir=$(pwd)
+   elif [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+      echo "Usage: mkbootanimation [workdir]"
+      echo "  workdir: The directory containing the boot animation files. If not specified, the current directory will be used."
+      # Return to the original directory
+      cd "$original_dir"
+      return
+   else
+      workdir=$(realpath "$1")
+   fi
+
+   dirs=$(ls "$workdir")
+   for dir in $dirs; do
+       if [ ! -d "$workdir/$dir" ]; then
+          continue
+       fi
+       echo "PNG compression for pngs in $workdir/$dir"
+       cd "$workdir/$dir"
+       for fn in *.png ; do pngcrush -q ${fn} ${fn}.new && mv -f ${fn}.new ${fn}; done
+       pngquant --force --ext .png *.png
+       cd "$workdir"
+   done
+   cd "$workdir"
+   echo "start zip ...."
+   # Output the zip file to the current directory
+   zip -0qry "$original_dir/bootanimation.zip" * -x "*.zip"
+   echo "done in $original_dir/bootanimation.zip"
+
+   # Return to the original directory
+   cd "$original_dir"
+}
+
 # unpack ramdisk to current dir
 function unpack_ramdisk()
 {
